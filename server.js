@@ -47,3 +47,8 @@ app.get('/latest-business-id', (req, res) => {
 });
 
 // Endpoint to fetch business JSON with explicit headers (optional alternative)
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
