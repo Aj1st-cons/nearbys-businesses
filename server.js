@@ -14,6 +14,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Ensure 'public/businesses' directory exists
+const businessesDir = path.join(__dirname, 'public', 'businesses');
+if (!fs.existsSync(businessesDir)) {
+  fs.mkdirSync(businessesDir, { recursive: true });
+}
+
 // Serve all public assets
 app.use(express.static('public'));
 
@@ -21,17 +27,15 @@ app.use(express.static('public'));
 app.use('/businesses', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   next();
-}, express.static(path.join(__dirname, 'public', 'businesses')));
+}, express.static(businessesDir));
 
 // Endpoint to get the last business number
 app.get('/latest-business-id', (req, res) => {
-  const dir = path.join(__dirname, 'public', 'businesses');
-  
-  if (!fs.existsSync(dir)) {
+  if (!fs.existsSync(businessesDir)) {
     return res.json({ lastNumber: 0 });
   }
 
-  const files = fs.readdirSync(dir).filter(file => file.endsWith('.json'));
+  const files = fs.readdirSync(businessesDir).filter(file => file.endsWith('.json'));
   
   let maxNumber = 0;
 
@@ -45,8 +49,6 @@ app.get('/latest-business-id', (req, res) => {
 
   res.json({ lastNumber: maxNumber });
 });
-
-// Endpoint to fetch business JSON with explicit headers (optional alternative)
 
 // Start the server
 app.listen(port, () => {
